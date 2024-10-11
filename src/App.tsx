@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { RefreshCw, Heart, Trash2 } from 'lucide-react';
 
 interface Quote {
-  content: string;
+  quote: string;
   author: string;
 }
 
 const fallbackQuote: Quote = {
-  content: "The only way to do great work is to love what you do.",
+  quote: "The only way to do great work is to love what you do.",
   author: "Steve Jobs"
 };
 
@@ -21,12 +21,12 @@ function App() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://api.quotable.io/random');
+      const response = await fetch('https://quoteslate.vercel.app/api/quotes/random');
       if (!response.ok) {
         throw new Error('Failed to fetch quote');
       }
       const data = await response.json();
-      setQuote({ content: data.content, author: data.author });
+      setQuote({ quote: data.quote, author: data.author });
     } catch (error) {
       console.error('Error fetching quote:', error);
       if (retries > 0) {
@@ -45,13 +45,13 @@ function App() {
   }, []);
 
   const addToFavorites = () => {
-    if (quote && !favorites.some(fav => fav.content === quote.content)) {
+    if (quote && !favorites.some(fav => fav.quote === quote.quote)) {
       setFavorites([...favorites, quote]);
     }
   };
 
   const removeFromFavorites = (quoteToRemove: Quote) => {
-    setFavorites(favorites.filter(fav => fav.content !== quoteToRemove.content));
+    setFavorites(favorites.filter(fav => fav.quote !== quoteToRemove.quote));
   };
 
   return (
@@ -66,7 +66,7 @@ function App() {
         )}
         {quote ? (
           <>
-            <p className="text-xl font-semibold mb-4">"{quote.content}"</p>
+            <p className="text-xl font-semibold mb-4">"{quote.quote}"</p>
             <p className="text-right text-gray-600">- {quote.author}</p>
           </>
         ) : (
@@ -87,7 +87,7 @@ function App() {
           </button>
           <button
             onClick={addToFavorites}
-            disabled={!quote || favorites.some(fav => fav.content === quote.content)}
+            disabled={!quote || favorites.some(fav => fav.quote === quote.quote)}
             className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded flex items-center"
           >
             <Heart className="mr-2" size={18} />
@@ -102,7 +102,7 @@ function App() {
             {favorites.map((fav, index) => (
               <li key={index} className="p-4 flex justify-between items-center">
                 <div>
-                  <p className="font-semibold">"{fav.content}"</p>
+                  <p className="font-semibold">"{fav.quote}"</p>
                   <p className="text-sm text-gray-600">- {fav.author}</p>
                 </div>
                 <button
