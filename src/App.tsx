@@ -6,10 +6,13 @@ interface Quote {
   author: string;
 }
 
-const fallbackQuote: Quote = {
-  content: "The only way to do great work is to love what you do.",
-  author: "Steve Jobs"
-};
+const fallbackQuotes: Quote[] = [
+  { content: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+  { content: "Life is what happens when you're busy making other plans.", author: "John Lennon" },
+  { content: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
+  { content: "Strive not to be a success, but rather to be of value.", author: "Albert Einstein" },
+  { content: "The best way to predict the future is to create it.", author: "Peter Drucker" }
+];
 
 const categories = [
   "all", "inspirational", "life", "love", "wisdom", "happiness", "success", "technology"
@@ -40,8 +43,8 @@ function App() {
       if (retries > 0) {
         setTimeout(() => fetchQuote(retries - 1), 1000);
       } else {
-        setError('Unable to fetch a new quote. Please try again later.');
-        setQuote(fallbackQuote);
+        setError('Unable to fetch a new quote. Using a random fallback quote.');
+        setQuote(fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)]);
       }
     } finally {
       setIsLoading(false);
@@ -81,8 +84,8 @@ function App() {
           </select>
         </div>
         {error && (
-          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
-            <p className="font-bold">Error</p>
+          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert">
+            <p className="font-bold">Notice</p>
             <p>{error}</p>
           </div>
         )}
