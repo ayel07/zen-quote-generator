@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { RefreshCw, Heart, Trash2, Filter, Tag } from 'lucide-react';
+import { fetchRandomQuote } from './services/quoteService';
 
 interface Quote {
   content: string;
@@ -77,29 +78,28 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [category, setCategory] = useState<string>("all");
 
-  const fetchQuote = async (retries = 2) => {
+  const fetchQuote = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const url = category === "all" 
-        ? 'https://api.quotable.io/random'
-        : `https://api.quotable.io/random?tags=${category}`;
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('Failed to fetch quote');
-      }
-      const data = await response.json();
-      setQuote({ content: data.content, author: data.author, category: category });
-    } catch (error) {
-      console.error('Error fetching quote:', error);
-      if (retries > 0) {
-        setTimeout(() => fetchQuote(retries - 1), 1000);
+      // Try to fetch from API with built-in fallbacks
+      const apiQuote = await fetchRandomQuote();
+      
+      if (apiQuote) {
+        setQuote({ ...apiQuote, category: category });
       } else {
+        // All APIs failed, use fallback quotes
         setError('Unable to fetch a new quote. Using a random fallback quote for the selected category.');
         const fallbackCategory = fallbackQuotes[category] ? category : 'all';
         const randomQuote = fallbackQuotes[fallbackCategory][Math.floor(Math.random() * fallbackQuotes[fallbackCategory].length)];
         setQuote({ ...randomQuote, category: fallbackCategory });
       }
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      setError('Unable to fetch a new quote. Using a random fallback quote for the selected category.');
+      const fallbackCategory = fallbackQuotes[category] ? category : 'all';
+      const randomQuote = fallbackQuotes[fallbackCategory][Math.floor(Math.random() * fallbackQuotes[fallbackCategory].length)];
+      setQuote({ ...randomQuote, category: fallbackCategory });
     } finally {
       setIsLoading(false);
     }
