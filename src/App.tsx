@@ -71,6 +71,8 @@ const categories = [
   "all", "inspirational", "life", "love", "wisdom", "happiness", "success", "technology"
 ];
 
+const MAX_FAVORITES = 10;
+
 function App() {
   const [quote, setQuote] = useState<Quote | null>(null);
   const [favorites, setFavorites] = useState<Quote[]>([]);
@@ -110,7 +112,7 @@ function App() {
   }, [category]);
 
   const addToFavorites = () => {
-    if (quote && !favorites.some(fav => fav.content === quote.content)) {
+    if (quote && !favorites.some(fav => fav.content === quote.content) && favorites.length < MAX_FAVORITES) {
       setFavorites([...favorites, quote]);
     }
   };
@@ -164,14 +166,22 @@ function App() {
             )}
             New Quote
           </button>
-          <button
-            onClick={addToFavorites}
-            disabled={!quote || favorites.some(fav => fav.content === quote.content)}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded flex items-center"
-          >
-            <Heart className="mr-2" size={18} />
-            Favorite
-          </button>
+          {favorites.length < MAX_FAVORITES && (
+            <button
+              onClick={addToFavorites}
+              disabled={!quote || favorites.some(fav => fav.content === quote.content)}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded flex items-center"
+            >
+              <Heart className="mr-2" size={18} />
+              Favorite
+            </button>
+          )}
+          {favorites.length >= MAX_FAVORITES && (
+            <div className="bg-red-100 border border-red-400 text-red-700 font-bold py-2 px-4 rounded flex items-center">
+              <Heart className="mr-2 fill-red-700" size={18} />
+              <span className="text-sm">Max 10 Favorites</span>
+            </div>
+          )}
         </div>
       </div>
       {favorites.length > 0 && (
